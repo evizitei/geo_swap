@@ -8,8 +8,8 @@ Gem::Specification.new do |gem|
   gem.version       = GeoSwap::VERSION
   gem.authors       = ["Ethan Vizitei"]
   gem.email         = ["ethan.vizitei@gmail.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.description   = %q{Simple utility functions for converting between coordinate systems (Lat/Long, UTM, USNG)}
+  gem.summary       = %q{Simple utility functions for converting between coordinate systems (Lat/Long, UTM, USNG)}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($/)
