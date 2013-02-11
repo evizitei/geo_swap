@@ -12,7 +12,7 @@ module GeoSwap
       {
         lat: 41.8901694,
         long: 12.4922694,
-        utm: "33T 291952mE 4640623mN",
+        utm: "33T 291952mE 4640622mN",
       }
     ]
 
@@ -40,7 +40,8 @@ module GeoSwap
 
       it 'correctly converts several reference points' do
         DATA.each do |data|
-          GeoSwap.lat_long_to_utm(data[:lat], data[:long]).should == data[:utm]
+          GeoSwap.lat_long_to_utm(data[:lat], data[:long]).to_s.
+            should == data[:utm]
         end
       end
     end
