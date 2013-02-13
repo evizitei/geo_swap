@@ -45,6 +45,12 @@ module GeoSwap
         end
       end
     end
+
+    describe 'utm_to_usng' do
+      it 'converts utm to usng' do
+        GeoSwap.utm_to_usng(560921.64, 4308133.45, 15, 'S').should == '15S WD 60922 8133'
+      end
+    end
   end
 
 end

@@ -21,7 +21,7 @@ module GeoSwap
 
       it 'applys the zone formula correctly' do
         ZONE_DATA.each do |data|
-          Zone.new(data[:long]).number.should == data[:zone_number]
+          Zone.new(0, data[:long]).number.should == data[:zone_number]
         end
       end
 
@@ -29,15 +29,15 @@ module GeoSwap
 
     describe 'determining the zone origin' do
       it 'can migrate from too far left' do
-        Zone.new(-180).origin.should == -177
+        Zone.new(0, -180).origin.should == -177
       end
 
       it 'can migrate from too far right' do
-        Zone.new(180).origin.should == 177
+        Zone.new(0, 180).origin.should == 177
       end
 
       it 'doesnt change the value when the long is already the origin' do
-        Zone.new(3).origin.should == 3
+        Zone.new(0, 3).origin.should == 3
       end
     end
 

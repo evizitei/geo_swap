@@ -61,6 +61,20 @@ module GeoSwap
 
   module_function :lat_long_to_utm
 
+  def utm_to_usng(easting, northing, zone_number, zone_letter, hemisphere = 'N')
+    precision = 10
+    if hemisphere == 'S'
+      northing += NORTHING_OFFSET
+    end
+
+    letters = find_grid_letters(zone_number, northing, easting)
+    usngNorthing = (northing % BLOCK_SIZE).round
+    usngEasting = (easting % BLOCK_SIZE).round
+
+    "#{zone_number}#{zone_letter} #{letters} #{usngEasting} #{usngNorthing}"
+  end
+
+  module_function :utm_to_usng
 
   private
 
@@ -79,6 +93,10 @@ module GeoSwap
   EASTING_OFFSET = 500000.0
   NORTHING_OFFSET = 10000000.0
 
+  BLOCK_SIZE  = 100000
+  GRIDSQUARE_SET_COL_SIZE = 8
+  GRIDSQUARE_SET_ROW_SIZE = 20
+
   def self.validate_range(lat, long)
     unless lat.between?(MIN_LATITUDE, MAX_LATITUDE) && long.between?(MIN_LONGITUDE, MAX_LONGITUDE)
       raise InputError, 'Input coordinates are invalid'
@@ -92,6 +110,61 @@ module GeoSwap
   def self.ecc(power, numerator, denominator)
     ecc = ECC_SQUARED ** power
     (numerator * ecc) / denominator
+  end
+
+  def self.find_grid_letters(zone_number, northing, easting)
+    row = 1
+    north_1m = northing.round
+    while north_1m >= BLOCK_SIZE do
+      north_1m = north_1m - BLOCK_SIZE
+      row += 1;
+    end
+    row = row % GRIDSQUARE_SET_ROW_SIZE
+
+    col = 0
+    east_1m = easting.round
+    while east_1m >= BLOCK_SIZE
+      east_1m = east_1m - BLOCK_SIZE
+      col += 1
+    end
+    col = col % GRIDSQUARE_SET_COL_SIZE
+
+    letters_helper(find_set(zone_number), row, col)
+  end
+
+  LETTERS_MAP = [
+    { cols: "ABCDEFGH", rows: "ABCDEFGHJKLMNPQRSTUV" },
+    { cols: "JKLMNPQR", rows: "FGHJKLMNPQRSTUVABCDE" },
+    { cols: "STUVWXYZ", rows: "ABCDEFGHJKLMNPQRSTUV" },
+    { cols: "ABCDEFGH", rows: "FGHJKLMNPQRSTUVABCDE" },
+    { cols: "JKLMNPQR", rows: "ABCDEFGHJKLMNPQRSTUV" },
+    { cols: "STUVWXYZ", rows: "FGHJKLMNPQRSTUVABCDE" }
+  ]
+
+  ZONE_TO_SET = [6, 1, 2, 3, 4, 5]
+
+  def self.find_set(zone_number)
+    zoneNum = zone_number % 6
+    ZONE_TO_SET[zoneNum.to_i] || -1
+  end
+
+  def self.letters_helper(set, row, col)
+    if row == 0
+      row = GRIDSQUARE_SET_ROW_SIZE - 1
+    else
+      row -= 1
+    end
+
+    if col == 0
+      col = GRIDSQUARE_SET_COL_SIZE - 1
+    else
+      col -= 1
+    end
+
+    l1 = l2 = nil
+
+    hash = LETTERS_MAP[set - 1]
+    hash[:cols][col] + hash[:rows][row]
   end
 
 end
