@@ -1,4 +1,3 @@
-require 'pry'
 require "geo_swap/version"
 require 'geo_swap/zone'
 require 'geo_swap/utilities'
